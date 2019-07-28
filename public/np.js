@@ -1,56 +1,57 @@
 let NP = {
     initId: "",
     routes: [],
-    checkRouter: function() {
+    initTemplateByRouter: function() {
         let routesLength = this.routes.length;
         let path = (location.pathname[location.pathname.length-1] == '/') ? location.pathname.slice(0,location.pathname.length-1) : location.pathname;
-        let index;
+        let template;
         if (routesLength > 0){
             for (let i = 0; i< routesLength; i++) {
                 if(path == this.routes[i].path){
-                    index = i;
+                    template = this.routes[i].template;
                     break;
                 }
             }
-            this.initTemplate(this.routes[index].template);
+            document.title = template.title;
+            document.getElementById(this.initId).innerHTML = template.html;
+            this.initEventToClickRoute();
         }
-    },
-    initTemplate: function(template) {
-        document.title = template.title;
-        document.getElementById(this.initId).innerHTML = template.html;
-        this.initEventToClickRoute();
     },
     initEventToClickRoute: function() {
         let that = this;
         let routes = document.getElementsByTagName("a");
         let routeLength = routes.length;
+        let routeLink;
         for(let i=0; i<routeLength; i++){
             if(location.origin == routes[i].origin){
                 routes[i].onclick = function(){
-                    let routeLink = document.getElementsByTagName("a")[i].href;
+                    routeLink = document.getElementsByTagName("a")[i].href;
                     document.getElementsByTagName("a")[i].href = 'javascript: void(0)';
                     history.pushState({}, '',routeLink);
-                    that.checkRouter();
+                    that.initTemplateByRouter();
                 }
             }
         }
     },
-    checkAfterLoad: function() {
+    renderAfterLoad: function() {
         let that = this;
         that.initEventToClickRoute();
 
         window.onload = function() {
-            that.checkRouter();
+            that.initTemplateByRouter();
         };
         window.onbeforeunload = function() {
-            that.checkRouter();
+            that.initTemplateByRouter();
         };
         window.addEventListener("popstate", function() {
-            that.checkRouter();
+            that.initTemplateByRouter();
         })
+    },
+    getAllElementsByAttr: function(attrib){
+        return document.querySelectorAll('['+attrib+']');
     },
     init: function(id) {
         this.initId = id;
-        this.checkAfterLoad()
+        this.renderAfterLoad();
     }
 };
