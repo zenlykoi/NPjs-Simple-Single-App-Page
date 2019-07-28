@@ -2,6 +2,7 @@
  * @name : NPjs
  * @description : The simple single page app
  * @author : Nguyen Phuong(NP)
+ * @contributors : Nguyen Phuong(NP),...
  * @version : 0.1.0
  */
 let NP = {
@@ -50,11 +51,14 @@ let NP = {
      * @functional : 
      *      - Init HTML of router to DOM(initId)
      *      - Delete all DOM have attribute np-if == false
+     *      - Init any text in HTML document like template egine -> initTextToHTML()
+     *      - Init event when click to link -> initEventToClickRoute()
      */
     initTemplateByRouter: function() {
         let routesLength = this.routes.length;
         let path = (location.pathname[location.pathname.length-1] == '/') ? location.pathname.slice(0,location.pathname.length-1) : location.pathname;
         let template,listIfDOM,listIfDOMLength;
+
         if (routesLength > 0){
             for (let i = 0; i< routesLength; i++) {
                 if(path == this.routes[i].path){
@@ -64,6 +68,7 @@ let NP = {
             }
             document.title = template.title;
             document.getElementById(this.initId).innerHTML = template.html;
+
             listIfDOM = this.getAllElementsByAttr(this.attrIf);
             listIfDOMLength = listIfDOM.length;
             for(let i=0; i<listIfDOMLength; i++){
@@ -71,6 +76,9 @@ let NP = {
                     document.getElementById(this.initId).removeChild(listIfDOM[i]);
                 }
             }
+
+            this.initTextToHTML();
+
             this.initEventToClickRoute();
         }
     },
@@ -88,15 +96,36 @@ let NP = {
         let routes = document.getElementsByTagName("a");
         let routeLength = routes.length;
         let routeLink;
+
         for(let i=0; i<routeLength; i++){
             if(location.origin == routes[i].origin){
                 routes[i].onclick = function(){
                     routeLink = document.getElementsByTagName("a")[i].href;
                     document.getElementsByTagName("a")[i].href = 'javascript: void(0)';
                     history.pushState({}, '',routeLink);
+
                     that.initTemplateByRouter();
                 }
             }
+        }
+    },
+    /*
+     * @name : initTextToHTML
+     * @author : Nguyen Phuong(NP)
+     * @type : function
+     * @functional : 
+     *      - Init any text in HTML document like template egine
+     * @example : 
+     *      - <np text="your text string"></np>
+     */
+    initTextToHTML: function(){
+        let dataTag = document.getElementsByTagName('np');
+        let dataTagLength = dataTag.length;
+        let dataTagText;
+        for(let i=0; i<dataTagLength; i++){
+            dataTagText = dataTag[i].getAttribute('text');
+            console.log(document.getElementsByTagName('np')[i].outerHTML);
+            document.getElementsByTagName('np')[i].outerHTML = dataTagText;
         }
     },
     /*
