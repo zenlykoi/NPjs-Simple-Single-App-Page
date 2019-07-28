@@ -20,25 +20,18 @@ let NP = {
         document.getElementById(this.initId).innerHTML = template.html;
         this.initEventToClickRoute();
     },
-    initCss: function() {
-        let styleElem = document.createElement("style");
-        styleElem.innerHTML = `
-            route {
-                color: -webkit-link;
-                cursor: pointer;
-                text-decoration: underline;
-            }
-        `;
-        document.head.appendChild(styleElem)
-    },
     initEventToClickRoute: function() {
         let that = this;
-        let routes = document.getElementsByTagName("route");
+        let routes = document.getElementsByTagName("a");
         let routeLength = routes.length;
         for(let i=0; i<routeLength; i++){
-            routes[i].onclick = function(){
-                history.pushState({}, '',document.getElementsByTagName("route")[i].getAttribute("path"));
-                that.checkRouter();
+            if(location.origin == routes[i].origin){
+                routes[i].onclick = function(){
+                    let routeLink = document.getElementsByTagName("a")[i].href;
+                    document.getElementsByTagName("a")[i].href = 'javascript: void(0)';
+                    history.pushState({}, '',routeLink);
+                    that.checkRouter();
+                }
             }
         }
     },
@@ -58,7 +51,6 @@ let NP = {
     },
     init: function(id) {
         this.initId = id;
-        this.initCss();
         this.checkAfterLoad()
     }
 };
