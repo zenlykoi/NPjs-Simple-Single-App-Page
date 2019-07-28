@@ -59,4 +59,3 @@ let NP = {
         this.checkAfterLoad()
     }
 };
-module.exports = NP;
