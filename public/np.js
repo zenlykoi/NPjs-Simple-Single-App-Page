@@ -4,12 +4,15 @@ let NP = {
     checkRouter: function() {
         let routesLength = this.routes.length;
         let path = (location.pathname[location.pathname.length-1] == '/') ? location.pathname.slice(0,location.pathname.length-1) : location.pathname;
+        let index;
         if (routesLength > 0){
             for (let i = 0; i< routesLength; i++) {
                 if(path == this.routes[i].path){
-                    this.initTemplate(this.routes[i].template);
+                    index = i;
+                    break;
                 }
             }
+            this.initTemplate(this.routes[index].template);
         }
     },
     initTemplate: function(template) {
