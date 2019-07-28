@@ -3,7 +3,7 @@ let NP = {
     routes: [],
     checkRouter: function() {
         let routesLength = this.routes.length;
-        let path = location.pathname;
+        let path = (location.pathname[location.pathname.length-1] == '/') ? location.pathname.slice(0,location.pathname.length-1) : location.pathname;
         if (routesLength > 0){
             for (let i = 0; i< routesLength; i++) {
                 if(path == this.routes[i].path){
