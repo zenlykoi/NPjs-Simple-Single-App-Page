@@ -39,25 +39,58 @@ let NP = {
      */
     data: {},
     /*
+     * @name : dataProxy
+     * @type : variable(object)
+     * @description : If you change this -> data change and All variable in HTML document change ...
+     */
+    dataProxy: {},
+    /*
+     * @name : dataTag
+     * @type : variable(string)
+     * @description : The name of tag to init any text in HTML document
+     */
+    dataTag: 'np',
+    /*
      * @name : attrIf
      * @type : variable(string)
      * @description : The name of attribute if DOM
      */
     attrIf: 'np-if',
     /*
+     * @name : attrFor
+     * @type : variable(string)
+     * @description : The name of attribute for DOM
+     */
+    attrFor: 'np-for',
+    /*
+     * @name : attrDataForOfDataTag
+     * @type : variable(string)
+     * @description : The attribute's name of element to render for loop data
+     */
+    attrDataForOfDataTag: 'data-for',
+    /*
+     * @name : attrTextOfDataTag
+     * @type : variable(string)
+     * @description : The name of attribute in dataTag to render text
+     */
+    attrTextOfDataTag: 'text',
+    /*
      * @name : initTemplateByRouter
      * @author : Nguyen Phuong(NP)
      * @type : function
      * @functional : 
      *      - Init HTML of router to DOM(initId)
-     *      - Delete all DOM have attribute np-if == false
+     *      - Add proxy to data (listen when data change)
+     *      - Delete all DOM have attribute np-if == false -> renderTagWithAttr('if')
+     *      - Render all tag have np-for attribute -> renderTagWithAttr('for')
      *      - Init any text in HTML document like template egine -> initTextToHTML()
      *      - Init event when click to link -> initEventToClickRoute()
+     *      - Run all script in template after load
      */
     initTemplateByRouter: function() {
         let routesLength = this.routes.length;
         let path = (location.pathname[location.pathname.length-1] == '/') ? location.pathname.slice(0,location.pathname.length-1) : location.pathname;
-        let template,listIfDOM,listIfDOMLength;
+        let template;
 
         if (routesLength > 0){
             for (let i = 0; i< routesLength; i++) {
@@ -69,17 +102,17 @@ let NP = {
             document.title = template.title;
             document.getElementById(this.initId).innerHTML = template.html;
 
-            listIfDOM = this.getAllElementsByAttr(this.attrIf);
-            listIfDOMLength = listIfDOM.length;
-            for(let i=0; i<listIfDOMLength; i++){
-                if(this.data.if[listIfDOM[i].getAttribute(this.attrIf)] == false){
-                    document.getElementById(this.initId).removeChild(listIfDOM[i]);
-                }
-            }
+            this.setDataProxy();
+
+            this.renderTagWithAttr('if');
+
+            this.renderTagWithAttr('for');
 
             this.initTextToHTML();
 
             this.initEventToClickRoute();
+
+            this.runScriptInTemplate();
         }
     },
     /*
@@ -98,7 +131,7 @@ let NP = {
         let routeLink;
 
         for(let i=0; i<routeLength; i++){
-            if(location.origin == routes[i].origin){
+            if(location.origin == routes[i].origin && this.checkHaveRouter(routes[i].pathname)){
                 routes[i].onclick = function(){
                     routeLink = document.getElementsByTagName("a")[i].href;
                     document.getElementsByTagName("a")[i].href = 'javascript: void(0)';
@@ -110,23 +143,125 @@ let NP = {
         }
     },
     /*
+     * @name : renderTagWithAttr
+     * @author : Nguyen Phuong(NP)
+     * @type : function
+     * @param : attr 
+     * @functional : 
+     *      - Delete all DOM have attribute np-if == false
+     *      - Render for DOM (developing...)
+     */
+    renderTagWithAttr: function(attr){
+        if(attr == 'if'){
+            let parentNode = document.getElementById(this.initId);
+            let listIfDOM = this.getAllElementsByAttr(this.attrIf);
+            let listIfDOMLength = listIfDOM.length;
+            for(let i=0; i<listIfDOMLength; i++){
+                if(this.data.if[listIfDOM[i].getAttribute(this.attrIf)] == false){
+                    parentNode.removeChild(listIfDOM[i]);
+                }
+            }
+        }
+        if(attr == 'for'){
+            // let listForDOM = this.getAllElementsByAttr(this.attrFor);
+            // let listForDOMLength = listForDOM.length;
+            // let attrForValue,listDataTagInThisNode,forDOMData;
+            // for(let i=0; i<listForDOMLength; i++){
+            //     forDOMDataLength = this.data.for[listForDOM[i].getAttribute(this.attrFor)].length;
+            //     let clone = listForDOM[i].cloneNode(true).outerHTML;
+            //     for(let j=0; j<forDOMDataLength - 1; j++){
+            //         clone += listForDOM[i].outerHTML;
+            //     }
+            //     listForDOM[i].outerHTML = clone;
+
+            //     let attrForDOMValue = listForDOM[i].getAttribute(this.attrFor);
+            //     let ArrayAttrForDOMValue = attrForDOMValue.split('.');
+
+            //     let listForData = this.getAllElementsByAttr(this.attrDataForOfDataTag);
+            //     let index = 0;
+            //     for(let j=0; j<listForData.length; j++){
+            //         let attrForDataValue = listForData[i].getAttribute(this.attrDataForOfDataTag);
+            //         let ArrayAttrForDataValue = attrForDataValue.split('.');
+            //         if(ArrayAttrForDOMValue[0] == ArrayAttrForDataValue[0]){
+            //             listForData[j].outerHTML = this.data.for[attrForDOMValue][index][ArrayAttrForDataValue[1]];
+            //             index ++;
+            //         }
+            //     }
+            // }
+        }
+    },
+    /*
      * @name : initTextToHTML
      * @author : Nguyen Phuong(NP)
      * @type : function
      * @functional : 
-     *      - Init any text in HTML document like template egine
+     *      - Render any text in HTML document like template egine
+     *      - If the first character is '$' -> render data
      * @example : 
      *      - <np text="your text string"></np>
+     *      - <np text="$example"></np>  -> render NP.data.example
      */
     initTextToHTML: function(){
-        let dataTag = document.getElementsByTagName('np');
-        let dataTagLength = dataTag.length;
-        let dataTagText;
-        for(let i=0; i<dataTagLength; i++){
-            dataTagText = dataTag[i].getAttribute('text');
-            console.log(document.getElementsByTagName('np')[i].outerHTML);
-            document.getElementsByTagName('np')[i].outerHTML = dataTagText;
+        let dataTagText = this.getAllElementsByAttr(this.attrTextOfDataTag);
+        let dataTagTextLength = dataTagText.length;
+        for(let i=0; i<dataTagTextLength; i++){
+            if(dataTagText[i].tagName.toLowerCase() == this.dataTag){
+                dataTagTextValue = dataTagText[i].getAttribute(this.attrTextOfDataTag);
+                dataTagTextValue = (dataTagTextValue[0] == '$') ? this.data[dataTagTextValue.substr(1)] : dataTagTextValue;
+                dataTagText[i].outerHTML = dataTagTextValue;
+            }
         }
+    },
+    /*
+     * @name : runScriptInTemplate
+     * @author : Nguyen Phuong(NP)
+     * @type : function
+     * @functional : 
+     *      - Run all script in template after load
+     */
+    runScriptInTemplate: function(){
+        let listScriptTag = this.getAllElementsByAttrAndDataTag('tag',document,'script');
+        for(let i=0; i<listScriptTag.length; i++){
+            eval(listScriptTag[i].innerHTML);
+            listScriptTag[i].outerHTML = '';
+        }
+    },
+    /*
+     * @name : setDataProxy
+     * @author : Nguyen Phuong(NP)
+     * @type : function
+     * @functional : 
+     *      - Add proxy to data,if change dataProxy -> data change and all var in HTML document change...
+     */
+    setDataProxy: function(){
+        var that = this;
+        this.dataProxy = new Proxy(this.data, {
+            set: function (target, key, value) {
+                target[key] = value;
+                that.initTemplateByRouter();
+                return true;
+            }
+        });
+    },
+    /*
+     * @name : checkHaveRouter
+     * @author : Nguyen Phuong(NP)
+     * @type : function
+     * @params : 
+     *      - path : Path of link you want to check
+     * @functional : 
+     *      - Check have router with any path
+     * @return : 
+     *      - True if have router
+     *      - False if not have router
+     */
+    checkHaveRouter: function(path){
+        for (let i = 0; i< this.routes.length; i++) {
+            if(path == this.routes[i].path){
+                return true;
+            }
+        }
+        return false;
     },
     /*
      * @name : renderAfterLoad
@@ -152,14 +287,46 @@ let NP = {
     /*
      * @name : getAllElementsByAttr
      * @author : Nguyen Phuong(NP)
-     * @type : function(support)
+     * @type : function
      * @params : 
-     *      - attrib : Attribute of DOM element you want to get
+     *      - attr : Attribute of DOM element you want to get
+     *      - parent : ParentNode of element (define = document)
      * @functional : 
      *      - Get all element have someone attribute
+     * @return : DOM element have attr attribute
      */
-    getAllElementsByAttr: function(attrib){
-        return document.querySelectorAll('['+attrib+']');
+    getAllElementsByAttr: function(attr,parent = document){
+        return parent.querySelectorAll('['+attr+']');
+    },
+    /*
+     * @name : getAllElementsByAttrAndDataTag
+     * @author : Nguyen Phuong(NP)
+     * @type : function
+     * @params : 
+     *      - attr : Attribute of DOM element you want to get
+     *      - parent : ParentNode of element (define = document)
+     *      - attrValue : Value of attr
+     * @functional : 
+     *      - Get all element have someone attribute and dataTag
+     * @return : List search result by attr and dataTag
+     */
+    getAllElementsByAttrAndDataTag: function(attr,parent = document,attrValue = ''){
+        let listDataTag = document.getElementsByTagName(this.dataTag);
+        let result = [];
+        if(attrValue && attrValue != undefined && attrValue != null && attrValue != ''){
+            for(let i=0; i<listDataTag.length; i++){
+                if(listDataTag[i].hasAttribute(attr) && listDataTag[i].getAttribute(attr) == attrValue){
+                    result.push(listDataTag[i]);
+                }
+            }
+        }else{
+            for(let i=0; i<listDataTag.length; i++){
+                if(listDataTag[i].hasAttribute(attr)){
+                    result.push(listDataTag[i]);
+                }
+            }
+        }
+        return result;
     },
     /*
      * @name : init
