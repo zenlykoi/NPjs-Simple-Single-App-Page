@@ -69,18 +69,6 @@ let NP = {
      */
     attrFor: 'np-for',
     /*
-     * @name : attrDataForOfDataTag
-     * @type : variable(string)
-     * @description : The attribute's name of element to render for loop data
-     */
-    attrDataForOfDataTag: 'data-for',
-    /*
-     * @name : attrTextOfDataTag
-     * @type : variable(string)
-     * @description : The name of attribute in dataTag to render text
-     */
-    attrTextOfDataTag: 'text',
-    /*
      * @name : initTemplateByRouter
      * @author : Nguyen Phuong(NP)
      * @type : function
@@ -155,7 +143,7 @@ let NP = {
      * @param : attr 
      * @functional : 
      *      - Delete all DOM have attribute np-if == false
-     *      - Render for DOM (developing...)
+     *      - Render for DOM
      */
     renderTagWithAttr: function(attr){
         if(attr == 'if'){
@@ -169,31 +157,30 @@ let NP = {
             }
         }
         if(attr == 'for'){
-            // let listForDOM = this.getAllElementsByAttr(this.attrFor);
-            // let listForDOMLength = listForDOM.length;
-            // let attrForValue,listDataTagInThisNode,forDOMData;
-            // for(let i=0; i<listForDOMLength; i++){
-            //     forDOMDataLength = this.data.for[listForDOM[i].getAttribute(this.attrFor)].length;
-            //     let clone = listForDOM[i].cloneNode(true).outerHTML;
-            //     for(let j=0; j<forDOMDataLength - 1; j++){
-            //         clone += listForDOM[i].outerHTML;
-            //     }
-            //     listForDOM[i].outerHTML = clone;
+            let listForLoop = this.getAllElementsByAttr(this.attrFor);
+            let dataLoop,listTextTag,forLoopElement,cloneNode,cloneNodelv2,cloneListTextTag,html='';
+            for(let i=0; i<listForLoop.length; i++){
+                forLoopElement = listForLoop[i];
+                cloneNode = forLoopElement.cloneNode(true);
+                dataLoop = this.data.for[forLoopElement.getAttribute(this.attrFor)];
+                listTextTag = this.getAllElementsByAttrAndDataTag('tag',forLoopElement,'text-for');
+                for(let j=0; j<dataLoop.length; j++){
+                    cloneNodelv2 = cloneNode.cloneNode(true);
+                    if(j == 0){
+                        for(let k=0; k<listTextTag.length; k++){
+                            listTextTag[k].outerHTML = dataLoop[j][listTextTag[k].getAttribute('data')];
+                        }
+                    }else{
+                        cloneListTextTag = this.getAllElementsByAttrAndDataTag('tag',cloneNodelv2,'text-for');
+                        for(let k=0; k<listTextTag.length; k++){
+                            cloneListTextTag[k].outerHTML = dataLoop[j][cloneListTextTag[k].getAttribute('data')];
+                        }
 
-            //     let attrForDOMValue = listForDOM[i].getAttribute(this.attrFor);
-            //     let ArrayAttrForDOMValue = attrForDOMValue.split('.');
-
-            //     let listForData = this.getAllElementsByAttr(this.attrDataForOfDataTag);
-            //     let index = 0;
-            //     for(let j=0; j<listForData.length; j++){
-            //         let attrForDataValue = listForData[i].getAttribute(this.attrDataForOfDataTag);
-            //         let ArrayAttrForDataValue = attrForDataValue.split('.');
-            //         if(ArrayAttrForDOMValue[0] == ArrayAttrForDataValue[0]){
-            //             listForData[j].outerHTML = this.data.for[attrForDOMValue][index][ArrayAttrForDataValue[1]];
-            //             index ++;
-            //         }
-            //     }
-            // }
+                        html += cloneNodelv2.outerHTML;
+                    }
+                }
+                forLoopElement.outerHTML += html;
+            }
         }
     },
     /*
@@ -315,7 +302,7 @@ let NP = {
      * @return : List search result by attr and dataTag
      */
     getAllElementsByAttrAndDataTag: function(attr,parent = this.initElement,attrValue = ''){
-        let listDataTag = document.getElementsByTagName(this.dataTag);
+        let listDataTag = parent.getElementsByTagName(this.dataTag);
         let result = [];
         if(attrValue && attrValue != undefined && attrValue != null && attrValue != ''){
             for(let i=0; i<listDataTag.length; i++){
