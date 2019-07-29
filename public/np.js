@@ -13,6 +13,12 @@ let NP = {
      */
     initId: "",
     /*
+     * @name : initElement
+     * @type : variable(DOM object)
+     * @description : DOM by initId
+     */
+    initElement: null,
+    /*
      * @name : routes
      * @type : variable(array)
      * @description : Array to store all page router
@@ -196,19 +202,17 @@ let NP = {
      * @type : function
      * @functional : 
      *      - Render any text in HTML document like template egine
-     *      - If the first character is '$' -> render data
      * @example : 
-     *      - <np text="your text string"></np>
-     *      - <np text="$example"></np>  -> render NP.data.example
+     *      - <np tag='text'>Nguyen Phuong</np>   ->  'Nguyen Phuong'
+     *      - <np tag='text' data='test'></np>  ->  data.test
      */
     initTextToHTML: function(){
-        let dataTagText = this.getAllElementsByAttr(this.attrTextOfDataTag);
-        let dataTagTextLength = dataTagText.length;
-        for(let i=0; i<dataTagTextLength; i++){
-            if(dataTagText[i].tagName.toLowerCase() == this.dataTag){
-                dataTagTextValue = dataTagText[i].getAttribute(this.attrTextOfDataTag);
-                dataTagTextValue = (dataTagTextValue[0] == '$') ? this.data[dataTagTextValue.substr(1)] : dataTagTextValue;
-                dataTagText[i].outerHTML = dataTagTextValue;
+        let listTextTag = this.getAllElementsByAttrAndDataTag('tag',this.initElement,'text');
+        for(let i=0; i<listTextTag.length; i++){
+            if(listTextTag[i].hasAttribute('data')){
+                listTextTag[i].outerHTML = this.data[listTextTag[i].getAttribute('data')];
+            }else{
+                listTextTag[i].outerHTML = listTextTag[i].innerHTML;
             }
         }
     },
@@ -220,7 +224,7 @@ let NP = {
      *      - Run all script in template after load
      */
     runScriptInTemplate: function(){
-        let listScriptTag = this.getAllElementsByAttrAndDataTag('tag',document,'script');
+        let listScriptTag = this.getAllElementsByAttrAndDataTag('tag',this.initElement,'script');
         for(let i=0; i<listScriptTag.length; i++){
             eval(listScriptTag[i].innerHTML);
             listScriptTag[i].outerHTML = '';
@@ -295,7 +299,7 @@ let NP = {
      *      - Get all element have someone attribute
      * @return : DOM element have attr attribute
      */
-    getAllElementsByAttr: function(attr,parent = document){
+    getAllElementsByAttr: function(attr,parent = this.initElement){
         return parent.querySelectorAll('['+attr+']');
     },
     /*
@@ -310,7 +314,7 @@ let NP = {
      *      - Get all element have someone attribute and dataTag
      * @return : List search result by attr and dataTag
      */
-    getAllElementsByAttrAndDataTag: function(attr,parent = document,attrValue = ''){
+    getAllElementsByAttrAndDataTag: function(attr,parent = this.initElement,attrValue = ''){
         let listDataTag = document.getElementsByTagName(this.dataTag);
         let result = [];
         if(attrValue && attrValue != undefined && attrValue != null && attrValue != ''){
@@ -339,6 +343,7 @@ let NP = {
      */
     init: function(id) {
         this.initId = id;
+        this.initElement = document.getElementById(id);
         this.renderAfterLoad();
     }
 };
