@@ -51,6 +51,12 @@ let NP = {
      */
     dataProxy: {},
     /*
+     * @name : renderDataSymbol
+     * @type : variable(object)
+     * @description : Symbol to render data in HTML document
+     */
+    renderDataSymbol: { open : '{{' , close : '}}' },
+    /*
      * @name : dataTag
      * @type : variable(string)
      * @description : The name of tag to init any text in HTML document
@@ -187,13 +193,14 @@ let NP = {
      * @name : initTextToHTML
      * @author : Nguyen Phuong(NP)
      * @type : function
+     * @status : - Old function, now not use it
      * @functional : 
      *      - Render any text in HTML document like template egine
      * @example : 
      *      - <np tag='text'>Nguyen Phuong</np>   ->  'Nguyen Phuong'
      *      - <np tag='text' data='test'></np>  ->  data.test
      */
-    initTextToHTML: function(){
+    initTextToHTML2: function(){
         let listTextTag = this.getAllElementsByAttrAndDataTag('tag',this.initElement,'text');
         for(let i=0; i<listTextTag.length; i++){
             if(listTextTag[i].hasAttribute('data')){
@@ -202,6 +209,39 @@ let NP = {
                 listTextTag[i].outerHTML = listTextTag[i].innerHTML;
             }
         }
+    },
+    /*
+     * @name : initTextToHTML
+     * @author : Nguyen Phuong(NP)
+     * @type : function
+     * @functional : 
+     *      - Render any text in HTML document like template egine
+     * @example : 
+     *      - {{example.test.1.a}}   ->  data[example][test][1][a]
+     */
+    initTextToHTML: function(data = this.data, parent = this.initElement, symbolOpen = this.renderDataSymbol.open, symbolClose = this.renderDataSymbol.close){
+        var innerHTML = parent.innerHTML;
+        var cloneHTML = innerHTML;
+        var arr1 = cloneHTML.split(symbolOpen);
+        var arr2 = [];
+        for (var i = 0; i < arr1.length; i++) {
+            if (arr1[i].indexOf('}}') != -1) {
+                arr2.push(arr1[i].split(symbolClose)[0]);
+            }
+        }
+        for (var i = 0; i < arr2.length; i++) {
+            cloneHTML = cloneHTML.replace(symbolOpen + arr2[i] + symbolClose, this.getObjDataByString(arr2[i]));
+        }
+        parent.innerHTML = cloneHTML;
+        return cloneHTML;
+    },
+    getObjDataByString: function(str , data = this.data){
+        var arr = str.split('.');
+        var result = data;
+        for(let i=0; i<arr.length; i++){
+            result = result[arr[i]];
+        }
+        return result;
     },
     /*
      * @name : runScriptInTemplate
@@ -227,11 +267,16 @@ let NP = {
     setDataProxy: function(){
         var that = this;
         this.dataProxy = new Proxy(this.data, {
-            set: function (target, key, value) {
-                target[key] = value;
-                that.initTemplateByRouter();
-                return true;
-            }
+            // set: function (target, key, value) {
+            //     console.log(target)
+            //     console.log(key)
+            //     console.log(value)
+            //     return;
+            // }
+            set(target, prop, val) {
+                console.log(target)
+                return true
+              }
         });
     },
     /*
