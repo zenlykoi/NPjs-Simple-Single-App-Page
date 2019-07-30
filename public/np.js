@@ -159,6 +159,8 @@ let NP = {
             for(let i=0; i<listIfDOMLength; i++){
                 if(this.data.if[listIfDOM[i].getAttribute(this.attrIf)] == false){
                     parentNode.removeChild(listIfDOM[i]);
+                }else{
+                    listIfDOM[i].removeAttribute(this.attrIf);
                 }
             }
         }
@@ -235,6 +237,17 @@ let NP = {
         parent.innerHTML = cloneHTML;
         return cloneHTML;
     },
+    /*
+     * @name : getObjDataByString
+     * @author : Nguyen Phuong(NP)
+     * @type : function
+     * @functional : 
+     *      - Return data by string
+     * @param :
+     *      - str : string description data you want to get
+     * @example : 
+     *      - str = 'example.hello.0.world' -> data[example][hello][0][world]
+     */
     getObjDataByString: function(str , data = this.data){
         var arr = str.split('.');
         var result = data;
