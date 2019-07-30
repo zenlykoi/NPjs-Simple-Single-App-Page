@@ -222,16 +222,16 @@ let NP = {
      *      - {{example.test.1.a}}   ->  data[example][test][1][a]
      */
     initTextToHTML: function(data = this.data, parent = this.initElement, symbolOpen = this.renderDataSymbol.open, symbolClose = this.renderDataSymbol.close){
-        var innerHTML = parent.innerHTML;
-        var cloneHTML = innerHTML;
-        var arr1 = cloneHTML.split(symbolOpen);
-        var arr2 = [];
-        for (var i = 0; i < arr1.length; i++) {
+        let innerHTML = parent.innerHTML;
+        let cloneHTML = innerHTML;
+        let arr1 = cloneHTML.split(symbolOpen);
+        let arr2 = [];
+        for (let i = 0; i < arr1.length; i++) {
             if (arr1[i].indexOf('}}') != -1) {
                 arr2.push(arr1[i].split(symbolClose)[0]);
             }
         }
-        for (var i = 0; i < arr2.length; i++) {
+        for (let i = 0; i < arr2.length; i++) {
             cloneHTML = cloneHTML.replace(symbolOpen + arr2[i] + symbolClose, this.getObjDataByString(arr2[i]));
         }
         parent.innerHTML = cloneHTML;
@@ -249,8 +249,8 @@ let NP = {
      *      - str = 'example.hello.0.world' -> data[example][hello][0][world]
      */
     getObjDataByString: function(str , data = this.data){
-        var arr = str.split('.');
-        var result = data;
+        let arr = str.split('.');
+        let result = data;
         for(let i=0; i<arr.length; i++){
             result = result[arr[i]];
         }
@@ -278,19 +278,22 @@ let NP = {
      *      - Add proxy to data,if change dataProxy -> data change and all var in HTML document change...
      */
     setDataProxy: function(){
-        var that = this;
-        this.dataProxy = new Proxy(this.data, {
-            // set: function (target, key, value) {
-            //     console.log(target)
-            //     console.log(key)
-            //     console.log(value)
-            //     return;
-            // }
-            set(target, prop, val) {
-                console.log(target)
+        let that = this;
+        var handle = {
+            get(target, key) {
+                if(typeof target[key] === 'object' && target[key] !== null) {
+                    return new Proxy(target[key], handle)
+                } else {
+                  return target[key];
+                }
+            },
+            set (target, key, value) {
+                target[key] = value;
+                that.initTemplateByRouter();
                 return true
-              }
-        });
+            }
+        };
+        this.dataProxy = new Proxy(this.data, handle);
     },
     /*
      * @name : checkHaveRouter
