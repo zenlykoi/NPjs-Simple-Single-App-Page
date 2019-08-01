@@ -89,7 +89,7 @@ let NP = {
      */
     initTemplateByRouter: function() {
         let routesLength = this.routes.length;
-        let path = (location.pathname[location.pathname.length-1] == '/') ? location.pathname.slice(0,location.pathname.length-1) : location.pathname;
+        let path = (location.pathname[location.pathname.length-1] == '/' && location.pathname != '/') ? location.pathname.slice(0,location.pathname.length-1) : location.pathname;
         let template;
 
         if (routesLength > 0){
@@ -102,6 +102,10 @@ let NP = {
             document.title = template.title;
             document.getElementById(this.initId).innerHTML = template.html;
 
+            this.initCss();
+
+            this.runScriptInTemplate();
+
             this.setDataProxy();
 
             this.renderTagWithAttr('if');
@@ -111,8 +115,6 @@ let NP = {
             this.initTextToHTML();
 
             this.initEventToClickRoute();
-
-            this.runScriptInTemplate();
         }
     },
     /*
@@ -197,27 +199,6 @@ let NP = {
      * @name : initTextToHTML
      * @author : Nguyen Phuong(NP)
      * @type : function
-     * @status : - Old function, now not use it
-     * @functional : 
-     *      - Render any text in HTML document like template egine
-     * @example : 
-     *      - <np tag='text'>Nguyen Phuong</np>   ->  'Nguyen Phuong'
-     *      - <np tag='text' data='test'></np>  ->  data.test
-     */
-    initTextToHTML2: function(){
-        let listTextTag = this.getAllElementsByAttrAndDataTag('tag',this.initElement,'text');
-        for(let i=0; i<listTextTag.length; i++){
-            if(listTextTag[i].hasAttribute('data')){
-                listTextTag[i].outerHTML = this.data[listTextTag[i].getAttribute('data')];
-            }else{
-                listTextTag[i].outerHTML = listTextTag[i].innerHTML;
-            }
-        }
-    },
-    /*
-     * @name : initTextToHTML
-     * @author : Nguyen Phuong(NP)
-     * @type : function
      * @functional : 
      *      - Render any text in HTML document like template egine
      * @example : 
@@ -270,6 +251,22 @@ let NP = {
         for(let i=0; i<listScriptTag.length; i++){
             eval(listScriptTag[i].innerHTML);
             listScriptTag[i].outerHTML = '';
+        }
+    },
+    /*
+     * @name : initCss
+     * @author : Nguyen Phuong(NP)
+     * @type : function
+     * @functional : 
+     *      - Append style tag to head document
+     */
+    initCss: function() {
+        let listStyleTag = this.getAllElementsByAttrAndDataTag('tag',this.initElement,'style');
+        for(let i=0; i<listStyleTag.length; i++){
+            let styleElem = document.createElement("style");
+            styleElem.innerHTML = listStyleTag[i].innerHTML;
+            document.head.appendChild(styleElem);
+            listStyleTag[i].outerHTML = '';
         }
     },
     /*
