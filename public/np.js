@@ -166,11 +166,12 @@ let NP = {
         }
         if(attr == 'for'){
             let listForLoop = this.getAllElementsByAttr(this.attrFor);
-            let dataLoop,listTextTag,forLoopElement,cloneNode,cloneNodelv2,cloneListTextTag,html='';
+            let dataLoop,listTextTag,forLoopElement,cloneNode,cloneNodelv2,cloneListTextTag;
             for(let i=0; i<listForLoop.length; i++){
+                let html = '';
                 forLoopElement = listForLoop[i];
                 cloneNode = forLoopElement.cloneNode(true);
-                dataLoop = this.data.for[forLoopElement.getAttribute(this.attrFor)];
+                dataLoop = this.getObjDataByString('for.' + forLoopElement.getAttribute(this.attrFor));
                 listTextTag = this.getAllElementsByAttrAndDataTag('tag',forLoopElement,'text-for');
                 for(let j=0; j<dataLoop.length; j++){
                     cloneNodelv2 = cloneNode.cloneNode(true);
@@ -183,9 +184,10 @@ let NP = {
                         for(let k=0; k<listTextTag.length; k++){
                             cloneListTextTag[k].outerHTML = dataLoop[j][cloneListTextTag[k].getAttribute('data')];
                         }
-
+                        cloneNodelv2.removeAttribute(this.attrFor);
                         html += cloneNodelv2.outerHTML;
                     }
+                    forLoopElement.removeAttribute(this.attrFor);
                 }
                 forLoopElement.outerHTML += html;
             }
