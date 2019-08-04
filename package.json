@@ -11,10 +11,6 @@
   "dependencies": {
     "ejs": "^2.6.2",
     "express": "^4.17.1",
-    "lodash": "^4.17.11",
-    "webpack": "^4.35.0"
-  },
-  "devDependencies": {
-    "webpack-cli": "^3.3.5"
+    "npjs": "^0.1.1"
   }
 }

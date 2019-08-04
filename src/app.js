@@ -1,36 +1,27 @@
-var NP = require('./np.min.js');
-var indexTpl = require('./components/index.js');
-var homeTpl = require('./components/home.js');
-var blogTpl = require('./components/blog.js');
-var contactTpl = require('./components/contact.js');
+window.NP = require('./np.min.js');
+var testComponent = require('./components/test.js')({ mess : 'hih' });
 NP.init('app');
+NP.data = {
+	test : 'hello world haha',
+	if : {
+		seen : false
+	}
+};
 NP.routes = [
 	{
 		path : '/',
 		template : {
 			title : 'Simple SPA Demo',
-			html : indexTpl
+			html : `
+				<a href="/test">test</a>
+			`
 		}
 	},
 	{
-		path : '/home',
+		path : '/test',
 		template : {
-			title : 'Home',
-			html : homeTpl
-		}
-	},
-	{
-		path : '/blog',
-		template : {
-			title : 'Blog',
-			html : blogTpl
-		}
-	},
-	{
-		path : '/contact',
-		template : {
-			title : 'Contact',
-			html : contactTpl
+			title : 'Test Components',
+			html : testComponent
 		}
 	}
 ];

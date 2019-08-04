@@ -4,7 +4,65 @@
 	<title>Simple SPA Demo</title>
 </head>
 <body>
+	<a href="https://github.com/zenlykoi"><img style="position: absolute;right: 0;top: 0" width="149" height="149" src="forkme_github.png" alt="Fork me on GitHub"></a>
 	<div id="app"></div>
-	<script type="text/javascript" src="bundle.js"></script>
+	<script type="text/javascript" src="http://localhost:3000/np.min.js"></script>
+	<script type="text/javascript">
+		NP.init('app');
+		NP.routes = [
+			{
+				path : '/',
+				template : {
+					title : 'Home',
+					html : `
+						<h1>This is <i style="color:red">Home Page</i></h1>
+						<hr>
+						<a href="/blog">blog</a><br>
+						<a href="/about">about</a><br>
+						<a href="/contact">contact</a><br>
+					`
+				}
+			},
+			{
+				path : '/blog',
+				template : {
+					title : 'Blog',
+					html : `
+						<h1>This is <i style="color:red">Blog Page</i></h1>
+						<hr>
+						<a href="/">home</a><br>
+						<a href="/about">about</a><br>
+						<a href="/contact">contact</a><br>
+					`
+				}
+			},
+			{
+				path : '/about',
+				template : {
+					title : 'About',
+					html : `
+						<h1>This is <i style="color:red">About Page</i></h1>
+						<hr>
+						<a href="/">home</a><br>
+						<a href="/blog">blog</a><br>
+						<a href="/contact">contact</a><br>
+					`
+				}
+			},
+			{
+				path : '/contact',
+				template : {
+					title : 'Contact',
+					html : `
+						<h1>This is <i style="color:red">Contact Page</i></h1>
+						<hr>
+						<a href="/">home</a><br>
+						<a href="/blog">blog</a><br>
+						<a href="/about">about</a><br>
+					`
+				}
+			}
+		];
+	</script>
 </body>
 </html>

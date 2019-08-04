@@ -90,7 +90,7 @@ let NP = {
     initTemplateByRouter: function() {
         let routesLength = this.routes.length;
         let path = (location.pathname[location.pathname.length-1] == '/' && location.pathname != '/') ? location.pathname.slice(0,location.pathname.length-1) : location.pathname;
-        let template;
+        let template = null;
 
         if (routesLength > 0){
             for (let i = 0; i< routesLength; i++) {
@@ -99,8 +99,12 @@ let NP = {
                     break;
                 }
             }
-            document.title = template.title;
-            document.getElementById(this.initId).innerHTML = template.html;
+            if(template != null){
+                document.title = template.title;
+                if(template.html != '' && template.html != undefined){
+                    document.getElementById(this.initId).innerHTML = template.html;
+                }
+            }
 
             this.initCss();
 

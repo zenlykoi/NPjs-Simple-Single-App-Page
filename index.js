@@ -19,14 +19,17 @@ app.get('/',function(request,response){
 	response.render('index');
 });
 
-app.get('/home',function(request,response){
+app.get('/blog',function(request,response){
 	response.render('index');
 });
 
-app.get('/blog',function(request,response){
+app.get('/about',function(request,response){
 	response.render('index');
 });
 
 app.get('/contact',function(request,response){
 	response.render('index');
 });
+
+
+// => using component
