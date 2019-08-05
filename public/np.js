@@ -101,25 +101,25 @@ let NP = {
             }
             if(template != null){
                 document.title = template.title;
-                if(template.html != '' && template.html != undefined){
+                if(template.html != '' && template.html != undefined && template.html.replace(/\s/g, "") != ''){
                     document.getElementById(this.initId).innerHTML = template.html;
                 }
             }
-
-            this.initCss();
-
-            this.runScriptInTemplate();
-
-            this.setDataProxy();
-
-            this.renderTagWithAttr('if');
-
-            this.renderTagWithAttr('for');
-
-            this.initTextToHTML();
-
-            this.initEventToClickRoute();
         }
+
+        this.initCss();
+
+        this.runScriptInTemplate();
+
+        this.setDataProxy();
+
+        this.renderTagWithAttr('if');
+
+        this.renderTagWithAttr('for');
+
+        this.initTextToHTML();
+
+        this.initEventToClickRoute();
     },
     /*
      * @name : initEventToClickRoute
