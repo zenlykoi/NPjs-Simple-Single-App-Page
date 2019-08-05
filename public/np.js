@@ -43,7 +43,7 @@ let NP = {
      *              },...
      *           }
      */
-    data: {},
+    data: {if:{},for:{}},
     /*
      * @name : dataProxy
      * @type : variable(object)
