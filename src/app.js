@@ -1,26 +1,21 @@
-window.NP = require('./np.min.js');
-var testComponent = require('./components/test.js')({ mess : 'hih' });
+window.NP = require('npjs');
+var testComponent = require('./components/test.js')({ mess : 'Hello World' });
 NP.init('app');
-NP.data = {
-	test : 'hello world haha',
-	if : {
-		seen : false
-	}
-};
 NP.routes = [
 	{
-		path : '/',
+		path : '/component-index',
 		template : {
-			title : 'Simple SPA Demo',
+			title : 'Index Component',
 			html : `
-				<a href="/test">test</a>
+				<h1>Index</h1>
+				<a href="/component-test">test component</a>
 			`
 		}
 	},
 	{
-		path : '/test',
+		path : '/component-test',
 		template : {
-			title : 'Test Components',
+			title : 'Test Component',
 			html : testComponent
 		}
 	}

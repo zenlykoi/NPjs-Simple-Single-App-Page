@@ -11,6 +11,9 @@
   "dependencies": {
     "ejs": "^2.6.2",
     "express": "^4.17.1",
-    "npjs": "^0.1.1"
+    "npjs": "^0.1.3"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.3.6"
   }
 }

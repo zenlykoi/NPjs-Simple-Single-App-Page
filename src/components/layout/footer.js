@@ -1,9 +1,9 @@
 module.exports = function() {
   	return `
-  		This is Header ! <br>
+  		<h1 class="footer">This is Footer !</h1>
   		<np tag="style">
-  			body {
-  				background-color:red;
+  			.footer{
+  				color:yellow;
   			}
   		</np>
   	`;

@@ -33,3 +33,11 @@ app.get('/contact',function(request,response){
 
 
 // => using component
+
+app.get('/component-index',function(request,response){
+	response.render('component');
+});
+
+app.get('/component-test',function(request,response){
+	response.render('component');
+});
