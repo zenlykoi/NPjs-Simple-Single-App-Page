@@ -4,11 +4,13 @@
 	<title>Simple SPA Demo</title>
 </head>
 <body>
-	<a href="https://github.com/zenlykoi"><img style="position: absolute;right: 0;top: 0" width="149" height="149" src="forkme_github.png" alt="Fork me on GitHub"></a>
-	<div id="app"></div>
+	<div id="app">{{say}}</div>
 	<script type="text/javascript" src="http://localhost:3000/np.min.js"></script>
 	<script type="text/javascript">
 		NP.init('app');
+		NP.data = {
+			say : 'Hello World'
+		};
 		NP.routes = [
 			{
 				path : '/',
