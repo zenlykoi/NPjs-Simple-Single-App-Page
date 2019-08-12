@@ -87,7 +87,7 @@ let NP = {
      *      - Init event when click to link -> initEventToClickRoute()
      *      - Run all script in template after load
      */
-    initTemplateByRouter: function() {
+    initTemplateByRouter: function(runScript = true) {
         let routesLength = this.routes.length;
         let path = (location.pathname[location.pathname.length-1] == '/' && location.pathname != '/') ? location.pathname.slice(0,location.pathname.length-1) : location.pathname;
         let template = null;
@@ -109,7 +109,9 @@ let NP = {
 
         this.initCss();
 
-        this.runScriptInTemplate();
+        if(runScript == true){
+            this.runScriptInTemplate();
+        }
 
         this.setDataProxy();
 
@@ -120,6 +122,8 @@ let NP = {
         this.initTextToHTML();
 
         this.initEventToClickRoute();
+
+        this.removeAllDataTag();
     },
     /*
      * @name : initEventToClickRoute
@@ -209,20 +213,27 @@ let NP = {
      *      - {{example.test.1.a}}   ->  data[example][test][1][a]
      */
     initTextToHTML: function(data = this.data, parent = this.initElement, symbolOpen = this.renderDataSymbol.open, symbolClose = this.renderDataSymbol.close){
-        let innerHTML = parent.innerHTML;
+        let clone = parent.cloneNode(true);
+        this.removeAllDataTag(clone);
+        let innerHTML = clone.innerHTML;
         let cloneHTML = innerHTML;
         let arr1 = cloneHTML.split(symbolOpen);
         let arr2 = [];
-        for (let i = 0; i < arr1.length; i++) {
-            if (arr1[i].indexOf('}}') != -1) {
-                arr2.push(arr1[i].split(symbolClose)[0]);
+        arr1 = (cloneHTML.indexOf('{{') == -1 || cloneHTML.indexOf('}}') == -1) ? [] : arr1;
+        if(arr1.length > 0){
+            for (let i = 0; i < arr1.length; i++) {
+                if (arr1[i].indexOf('}}') != -1) {
+                    arr2.push(arr1[i].split(symbolClose)[0]);
+                }
             }
+            console.log(arr1)
+            console.log(arr2)
+            for (let i = 0; i < arr2.length; i++) {
+                cloneHTML = cloneHTML.replace(symbolOpen + arr2[i] + symbolClose, this.getObjDataByString(arr2[i]));
+            }
+            parent.innerHTML = cloneHTML;
+            eval(this.script);
         }
-        for (let i = 0; i < arr2.length; i++) {
-            cloneHTML = cloneHTML.replace(symbolOpen + arr2[i] + symbolClose, this.getObjDataByString(arr2[i]));
-        }
-        parent.innerHTML = cloneHTML;
-        return cloneHTML;
     },
     /*
      * @name : getObjDataByString
@@ -252,10 +263,12 @@ let NP = {
      */
     runScriptInTemplate: function(){
         let listScriptTag = this.getAllElementsByAttrAndDataTag('tag',this.initElement,'script');
+        this.script = '';
         for(let i=0; i<listScriptTag.length; i++){
-            eval(listScriptTag[i].innerHTML);
+            this.script += listScriptTag[i].innerHTML;
             listScriptTag[i].outerHTML = '';
         }
+        eval(this.script);
     },
     /*
      * @name : initCss
@@ -292,7 +305,7 @@ let NP = {
             },
             set (target, key, value) {
                 target[key] = value;
-                that.initTemplateByRouter();
+                that.initTemplateByRouter(false);
                 return true
             }
         };
@@ -338,6 +351,34 @@ let NP = {
         window.addEventListener("popstate", function() {
             that.initTemplateByRouter();
         })
+    },
+    /*
+     * @name : redirect
+     * @author : Nguyen Phuong(NP)
+     * @type : function
+     * @params : 
+     *      - path : link you want to redirect
+     * @functional : 
+     *      - redirect...
+     */
+    redirect: function(path){
+        history.pushState({}, '',path);
+        this.initTemplateByRouter();
+    },
+    /*
+     * @name : removeAllDataTag
+     * @author : Nguyen Phuong(NP)
+     * @type : function
+     * @params : 
+     *      - parent : ParentNode of element (define = document)
+     * @functional : 
+     *      - remove all dataTag
+     */
+    removeAllDataTag: function(parent = this.initElement){
+        let listDataTag = parent.getElementsByTagName(this.dataTag);
+        for(let i=0; i<listDataTag.length; i++){
+            listDataTag[i].outerHTML = '';
+        }
     },
     /*
      * @name : getAllElementsByAttr
