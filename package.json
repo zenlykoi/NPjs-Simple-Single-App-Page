@@ -14,6 +14,6 @@
     "npjs": "^0.1.3"
   },
   "devDependencies": {
-    "webpack-cli": "^3.3.6"
+    "webpack-cli": "^3.3.12"
   }
 }
